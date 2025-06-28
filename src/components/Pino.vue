@@ -51,69 +51,94 @@ import {tabuleiroVisual, animacaoMovimento} from '../visualConfig.ts';
 import {computed} from 'vue';
 import type { Disco as DiscoType, DiscoAnimado } from '../types.ts';
 
+// --- PROPS DO COMPONENTE ---
+// Estas são as propriedades que o Pino recebe do Tabuleiro.
 const props = defineProps<{
-  pino: DiscoType[],
-  indicePino: number,
-  podeSoltar: boolean,
-  selecionado: boolean,
-  hover: boolean,
-  arrastando: boolean,
-  arrastavel: boolean,
-  discoMovendo: DiscoAnimado | null
+  pino: DiscoType[], // O array de discos que estão neste pino.
+  indicePino: number, // O índice deste pino (0, 1 ou 2).
+  podeSoltar: boolean, // Indica se este pino é um destino válido para soltar um disco.
+  selecionado: boolean, // Indica se este pino é o pino de origem selecionado.
+  hover: boolean, // Indica se o mouse está sobre este pino durante um arraste.
+  arrastando: boolean, // Indica se um disco está sendo ativamente arrastado deste pino.
+  arrastavel: boolean, // Flag global que permite ou não o arraste (desabilitado durante a auto-resolução).
+  discoMovendo: DiscoAnimado | null // O objeto do disco "fantasma" em animação.
 }>();
 
+// --- PROPRIEDADES COMPUTADAS (COMPUTED) ---
+// Propriedades computadas são uma das funcionalidades mais poderosas do Vue. Elas criam valores
+// reativos que são derivados de outras fontes reativas (como props ou refs). Elas são eficientes
+// porque o Vue armazena o resultado em cache e só recalcula quando uma de suas dependências muda.
+
+/** Calcula a posição 'bottom' (CSS) para cada disco empilhado no pino. */
 const posicoesBase = computed(() =>
     props.pino.map((_, i) => tabuleiroVisual.baseDiscos + i * tabuleiroVisual.espacoEntreDiscos)
 );
 
+/** Retorna o índice do disco que está no topo do pino. */
 const indiceTopo = computed(() => props.pino.length > 0 ? props.pino.length - 1 : -1);
 
+/** Gera um array de booleanos indicando qual disco (se algum) deve ter o estilo 'selecionado'. */
 const selecionados = computed(() =>
     props.pino.map((_, i) => props.selecionado && i === indiceTopo.value)
 );
 
+/** Gera um array de booleanos indicando qual disco (se algum) deve ter o estilo 'hover'. */
 const comHover = computed(() =>
     props.pino.map((_, i) => props.hover && i === indiceTopo.value)
 );
 
+/** Gera um array de booleanos indicando qual disco (se algum) está sendo arrastado. */
 const sendoArrastado = computed(() =>
     props.pino.map((_, i) => props.arrastando && i === indiceTopo.value)
 );
 
+/** Gera um array de booleanos para ocultar o disco original enquanto sua versão "fantasma" está animando. */
 const ocultos = computed(() =>
     props.pino.map((disco) => props.discoMovendo && props.discoMovendo.id === disco.id)
 );
 
+/** Gera um array de booleanos indicando qual disco (apenas o do topo) pode ser arrastado. */
 const arrastaveis = computed(() =>
     props.pino.map((_, i) => i === indiceTopo.value && props.arrastavel)
 );
 
+/**
+ * Esta é a lógica central da animação "fantasma".
+ * Se este pino for a origem de um movimento, esta propriedade computada cria um objeto
+ * com todas as props necessárias para renderizar um componente Disco.vue "fantasma" que
+ * se moverá para o pino de destino.
+ */
 const discoAnimadoDestePino = computed(() => {
   const d = props.discoMovendo;
+  // Só cria o disco animado se houver um disco se movendo e se este pino for a origem.
   if (!d || d.pinoOrigem !== props.indicePino) return null;
   
-  // Calcula o deslocamento horizontal para o pino de destino
+  // Calcula o deslocamento horizontal necessário para a animação.
   const deslocamentoHorizontal = (d.pinoDestino - d.pinoOrigem) * (animacaoMovimento.larguraPino + animacaoMovimento.margemPino);
   
+  // Retorna um objeto que será passado como props para um novo componente Disco.
+  // Este objeto controla a posição, transformação e estilo do disco durante a animação.
   return {
     tamanho: d.tamanho,
     largura: d.largura,
     cor: d.cor,
     posx: '50%',
-    posy: d.animandoFinal ? d.bottomFinal : d.bottom,
+    posy: d.animandoFinal ? d.bottomFinal : d.bottom, // Anima a posição vertical.
     topo: false,
     selecionado: false,
     hover: false,
     arrastando: false,
     oculto: false,
     arrastavel: false,
-    animado: true,
+    animado: true, // Flag crucial que diz ao Disco.vue para usar seu estilo de animação.
     transition: animacaoMovimento.transicaoAnimacao,
-    transform: d.animandoFinal ? `translateX(calc(-50% + ${deslocamentoHorizontal}px))` : 'translateX(-50%)',
+    transform: d.animandoFinal ? `translateX(calc(-50% + ${deslocamentoHorizontal}px))` : 'translateX(-50%)', // Anima a posição horizontal.
     boxShadow: animacaoMovimento.sombraAnimacao
   };
 });
 
+// --- EVENTOS EMITIDOS ---
+// Declara os eventos que este componente emite para o Tabuleiro, que por sua vez os delega para o App.vue.
 // Eventos emitidos para o pai
 defineEmits([
   'clique', 'arrastar-hover', 'arrastar-sair', 'soltar', 'mouse-entrar', 'mouse-sair',
@@ -188,4 +213,4 @@ defineEmits([
   pointer-events: none;
   z-index: 2;
 }
-</style> 
+</style>

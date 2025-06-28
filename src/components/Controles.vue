@@ -34,27 +34,41 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-/**
- * Props do componente Controles
- * @prop {Number} quantidadeDiscos - Quantidade de discos
- * @prop {Number} movimentos - Número de movimentos realizados
- * @prop {Boolean} autoResolvendo - Se está no modo auto-resolver
- * @prop {Boolean} jogoGanho - Se o jogo foi ganho
- */
+// --- PROPS DO COMPONENTE ---
+// Define as propriedades que o componente Controles recebe do App.vue.
 const props = defineProps<{
-  quantidadeDiscos: number;
-  movimentos: number;
-  autoResolvendo: boolean;
-  jogoGanho: boolean;
+  quantidadeDiscos: number, // O número atual de discos no jogo.
+  movimentos: number, // O contador de movimentos do jogador.
+  autoResolvendo: boolean, // Flag que indica se a resolução automática está em andamento.
+  jogoGanho: boolean // Flag que indica se o jogo foi concluído.
 }>();
 
-// Eventos emitidos para o componente pai
+// --- EVENTOS EMITIDOS ---
+// Declara os eventos que este componente pode emitir para o App.vue.
+// Isso permite que o componente pai reaja às ações do usuário (cliques em botões, etc.).
 const emit = defineEmits(['reiniciar', 'auto-resolver', 'alterar-quantidade-discos']);
 
-// Calcula o número ótimo de movimentos
+// --- PROPRIEDADES COMPUTADAS ---
+
+/**
+ * Calcula o número mínimo de movimentos necessários para resolver o quebra-cabeça.
+ * A fórmula é 2^n - 1, onde n é o número de discos.
+ * Esta é uma propriedade computada, então o Vue a recalculará automaticamente
+ * sempre que a prop 'quantidadeDiscos' mudar.
+ */
 const movimentosOtimos = computed(() => Math.pow(2, props.quantidadeDiscos) - 1);
 
-// Computed para v-model do select
+/**
+ * 'quantidadeDiscosLocal' é uma propriedade computada com getter e setter.
+ * Este é um padrão comum no Vue para criar um v-model bidirecional em um componente filho
+ * que se baseia em uma prop (que é unidirecional por natureza).
+ *
+ * - get: Quando o <select> precisa ler o valor, ele lê diretamente da prop 'quantidadeDiscos'.
+ * - set: Quando o usuário seleciona um novo valor no <select>, o 'set' é chamado.
+ *        Ele não modifica a prop diretamente (o que causaria um aviso no Vue), mas emite um evento
+ *        'alterar-quantidade-discos' para o componente pai. O pai, então, atualiza o estado, e a nova
+ *        prop é passada de volta para este componente, completando o ciclo.
+ */
 const quantidadeDiscosLocal = computed({
   get: () => props.quantidadeDiscos,
   set: (valor) => emit('alterar-quantidade-discos', valor)

@@ -1,0 +1,217 @@
+= Documentação do Software: Torre de Hanói em Vue.js
+:toc: left
+:toclevels: 3
+:source-highlighter: highlight.js
+:sectnums:
+
+== Introdução
+
+Este documento descreve em detalhes a implementação do jogo Torre de Hanói, desenvolvido como uma aplicação web moderna e interativa. O objetivo é não apenas documentar o sistema, mas também servir como um guia de aprendizado sobre as tecnologias e os padrões de arquitetura utilizados.
+
+A aplicação foi construída com Vue.js 3, TypeScript e Vite, resultando em uma experiência de usuário fluida, com animações suaves e uma interface reativa.
+
+== Tecnologias Utilizadas
+
+=== Vue.js 3
+O Vue.js é um framework progressivo para a construção de interfaces de usuário. A versão 3, utilizada neste projeto, introduz a **Composition API**, que permite uma organização mais lógica e reutilizável do código, especialmente em componentes complexos. O uso do `<script setup>` simplifica a declaração de componentes, tornando o código mais conciso e legível.
+
+=== Vite
+O Vite é uma ferramenta de build de nova geração que oferece um ambiente de desenvolvimento extremamente rápido. Ele utiliza o suporte nativo do navegador para módulos ES (ESM) para servir o código, eliminando a necessidade de um processo de "bundle" demorado durante o desenvolvimento.
+
+=== TypeScript
+O TypeScript é um superset do JavaScript que adiciona tipagem estática opcional. Ao utilizar TypeScript, garantimos maior robustez e manutenibilidade ao código, prevenindo erros comuns em tempo de desenvolvimento e melhorando a autocompletação e a compreensão do código nas IDEs.
+
+== Estrutura do Projeto
+
+A estrutura de arquivos do projeto é organizada de forma lógica para separar as responsabilidades:
+
+```
+/Users/leonardo/Projetos/hanoi/
+├── src/
+│   ├── components/         # Componentes Vue reutilizáveis
+│   │   ├── Controles.vue
+│   │   ├── Disco.vue
+│   │   ├── Pino.vue
+│   │   └── Tabuleiro.vue
+│   ├── App.vue             # Componente raiz da aplicação
+│   ├── main.ts             # Ponto de entrada da aplicação
+│   ├── style.css           # Estilos globais
+│   ├── types.ts            # Definições de tipos TypeScript
+│   └── visualConfig.ts     # Configurações visuais (cores, tamanhos)
+├── index.html              # Ponto de entrada do HTML
+├── package.json            # Dependências e scripts do projeto
+└── vite.config.ts          # Configuração do Vite
+```
+
+== Arquitetura e Conceitos Fundamentais
+
+=== Arquitetura de Componentes
+A aplicação segue uma arquitetura de componentes hierárquica, onde a interface é dividida em pequenas partes reutilizáveis. A árvore de componentes principal é:
+
+*   `App.vue`
+    *   `Controles.vue`
+    *   `Tabuleiro.vue`
+        *   `Pino.vue` (x3)
+            *   `Disco.vue` (xN)
+
+=== Gerenciamento de Estado: Props para Baixo, Eventos para Cima
+O estado do jogo (a posição dos discos, o número de movimentos, etc.) é centralizado no componente `App.vue`. Este padrão de gerenciamento de estado é comum em Vue e funciona da seguinte maneira:
+
+1.  **Props para Baixo**: O `App.vue` passa o estado para os componentes filhos através de `props`. Por exemplo, o `Tabuleiro.vue` recebe a lista de `pinos`.
+2.  **Eventos para Cima**: Quando uma interação do usuário ocorre em um componente filho (ex: um clique em um `Disco.vue`), o componente emite um evento (`$emit`). Este evento é capturado pelo componente pai, que por sua vez pode processá-lo ou emiti-lo para seu próprio pai, até chegar ao `App.vue`, onde o estado é de fato modificado.
+
+Este fluxo unidirecional de dados torna a aplicação mais previsível e fácil de depurar.
+
+== Análise Detalhada dos Componentes
+
+=== `App.vue` - O Cérebro da Aplicação
+
+Este é o componente mais importante, responsável por toda a lógica e estado do jogo.
+
+*   **Responsabilidades**:
+    *   Manter o estado do jogo (`pinos`, `movimentos`, `quantidadeDiscos`).
+    *   Implementar a lógica de movimento dos discos (`podeMover`, `moverAnimadoSimples`).
+    *   Gerenciar a seleção de pinos e a interação de arrastar e soltar.
+    *   Implementar o algoritmo de resolução automática.
+    *   Verificar a condição de vitória.
+
+*   **Trecho de Código (Estado Principal)**:
+
+[source,javascript]
+----
+const quantidadeDiscos = ref(4);
+const pinos = ref([[], [], []]);
+const pinoSelecionado = ref(null);
+const movimentos = ref(0);
+const jogoGanho = ref(false);
+const autoResolvendo = ref(false);
+const discoMovendo = ref(null); // Objeto que representa o disco em animação
+----
+
+=== `Controles.vue` - A Interface do Usuário
+
+Este componente fornece os controles para o usuário interagir com o jogo.
+
+*   **Responsabilidades**:
+    *   Permitir a alteração da quantidade de discos.
+    *   Oferecer botões para reiniciar o jogo e para iniciar a resolução automática.
+    *   Exibir estatísticas como o número de movimentos atual e o mínimo necessário.
+
+*   **Trecho de Código (Emissão de Eventos)**:
+
+[source,html]
+----
+<select @change="$emit('alterar-quantidade-discos', quantidadeDiscosLocal)">
+  <!-- ... -->
+</select>
+
+<button @click="$emit('reiniciar')">Reiniciar</button>
+
+<button @click="$emit('auto-resolver')">Auto Resolver</button>
+----
+
+=== `Tabuleiro.vue` - O Palco do Jogo
+
+Este componente atua como um contêiner para os pinos.
+
+*   **Responsabilidades**:
+    *   Renderizar os três componentes `Pino.vue`.
+    *   Delegar os eventos de interação (clique, arrastar e soltar) dos pinos para o `App.vue`.
+    *   Passar as `props` necessárias para cada `Pino.vue` (ex: se está selecionado, se pode receber um disco).
+
+*   **Trecho de Código (Renderização dos Pinos)**:
+
+[source,html]
+----
+<Pino
+    v-for="(pino, indicePino) in pinos"
+    :key="indicePino"
+    :pino="pino"
+    :indice-pino="indicePino"
+    :selecionado="pinoSelecionado === indicePino"
+    @click="$emit('pino-clique', indicePino)"
+    @drop="$emit('pino-soltar', indicePino)"
+    ...
+/>
+----
+
+=== `Pino.vue` - As Hastes
+
+Representa uma única haste e os discos contidos nela.
+
+*   **Responsabilidades**:
+    *   Renderizar a haste e a base do pino.
+    *   Renderizar os componentes `Disco.vue` que estão empilhados nele.
+    *   Renderizar o disco "fantasma" durante a animação de movimento.
+    *   Aplicar estilos visuais dinâmicos (ex: destacar quando selecionado ou quando pode receber um disco).
+
+*   **Trecho de Código (Disco Animado)**: A propriedade computada `discoAnimadoDestePino` cria os dados para o disco "fantasma" que se move entre os pinos.
+
+[source,javascript]
+----
+const discoAnimadoDestePino = computed(() => {
+  const d = props.discoMovendo;
+  if (!d || d.pinoOrigem !== props.indicePino) return null;
+  
+  const deslocamentoHorizontal = (d.pinoDestino - d.pinoOrigem) * ...;
+  
+  return {
+    // ...props para o componente Disco
+    transform: d.animandoFinal ? `translateX(calc(-50% + ${deslocamentoHorizontal}px))` : 'translateX(-50%)',
+    // ...
+  };
+});
+----
+
+=== `Disco.vue` - A Peça do Jogo
+
+Um componente puramente visual que representa um único disco.
+
+*   **Responsabilidades**:
+    *   Renderizar-se com o tamanho e a cor corretos.
+    *   Aplicar estilos CSS com base em seu estado (selecionado, arrastando, oculto, etc.) recebido via `props`.
+    *   Distinguir entre o estilo de um disco empilhado e um disco em animação.
+
+*   **Trecho de Código (Estilo Dinâmico)**: O estilo final do disco é determinado pela `prop` `animado`.
+
+[source,javascript]
+----
+const estiloDisco = computed(() => {
+  return props.animado ? estiloAnimado.value : estiloEmpilhado.value;
+});
+----
+
+== Explicação das Funcionalidades Chave
+
+=== Sistema de Animação "Fantasma"
+
+Para criar uma animação de movimento suave sem complicar o gerenciamento do DOM, a aplicação utiliza uma técnica inteligente:
+
+1.  Quando um movimento é iniciado (`moverAnimadoSimples` em `App.vue`), o disco original no pino de origem é tornado invisível (`opacity: 0`).
+2.  Um novo disco "fantasma" (`discoMovendo`) é criado no estado do `App.vue`. 
+3.  O componente `Pino.vue` de origem renderiza este disco fantasma em sua posição inicial.
+4.  O estado do disco fantasma é atualizado para animar sua posição (`transform` e `bottom`) até o pino de destino.
+5.  Ao final da animação, o estado de dados real em `pinos.value` é atualizado, o disco fantasma é removido (`discoMovendo.value = null`), e o disco real aparece em sua nova posição no pino de destino.
+
+=== Algoritmo de Resolução Automática
+
+A função `autoResolver` em `App.vue` implementa a solução recursiva clássica para o problema da Torre de Hanói.
+
+[source,javascript]
+----
+async function resolver(n, de, para, aux) {
+  if (n === 1) {
+    await moverAnimadoSimples(de, para);
+  } else {
+    await resolver(n - 1, de, aux, para);
+    await moverAnimadoSimples(de, para);
+    await resolver(n - 1, aux, para, de);
+  }
+}
+----
+
+A função é `async` e utiliza `await` na chamada de `moverAnimadoSimples`, que retorna uma `Promise`. Isso garante que a recursão só continue após a animação de cada movimento ser concluída, permitindo que o usuário visualize a solução passo a passo.
+
+== Conclusão
+
+O projeto Torre de Hanói é um excelente exemplo de como as tecnologias web modernas podem ser usadas para criar aplicações interativas e bem estruturadas. A combinação do Vue.js 3 com a Composition API e o TypeScript resulta em um código limpo, reativo e de fácil manutenção. A arquitetura de componentes e o fluxo de dados unidirecional são fundamentais para a organização e a escalabilidade do software.
