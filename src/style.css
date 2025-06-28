@@ -1,0 +1,50 @@
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    margin: 0;
+}
+
+#app {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+:root {
+    /* Disco */
+    --disco-selecionado-glow1: rgba(255, 215, 0, 0.8);
+    --disco-selecionado-glow2: rgba(255, 215, 0, 0.4);
+    --disco-hover-border: #667eea;
+    --disco-hover-shadow: rgba(102, 126, 234, 0.3);
+    --disco-drag-shadow: rgba(118, 75, 162, 0.8);
+
+    /* Pino */
+    --pino-largura: 200px;
+    --pino-altura: 320px;
+    --pino-cor-fundo: #e7eaf3;
+    --pino-raio-borda: 16px;
+    --pino-cor-fundo-selecionado: #e0e7ff;
+    --pino-cor-fundo-pode-soltar: #e0ffe7;
+    --pino-cor-fundo-pode-soltar-sobre: #d6ffe7;
+    --pino-largura-haste: 14px;
+    --pino-altura-haste: 280px;
+    --pino-cor: #bfc7d1;
+    --pino-raio-haste: 7px;
+    --pino-largura-base: 110px;
+    --pino-altura-base: 22px;
+    --pino-raio-base: 11px;
+    --pino-box-shadow-selecionado: 0 0 0 4px rgba(102, 126, 234, 0.6);
+    --pino-box-shadow-pode-soltar: 0 0 0 4px rgba(38, 180, 122, 0.6);
+    --pino-box-shadow-pode-soltar-sobre: 0 0 0 8px rgba(38, 180, 122, 0.3);
+
+    /* Tabuleiro */
+    --tabuleiro-largura: 900px;
+    --tabuleiro-altura: 480px;
+    --tabuleiro-cor-fundo: #f3f6fa;
+    --tabuleiro-raio-borda: 18px;
+    --tabuleiro-box-shadow: 0 2px 12px rgba(102, 126, 234, 0.1);
+}
