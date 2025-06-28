@@ -60,7 +60,7 @@ const props = defineProps<{
 // --- EVENTOS EMITIDOS ---
 // defineEmits declara os eventos que este componente pode emitir para o seu pai (App.vue).
 // Isso é bom para a documentação e organização do código.
-declareEmits([
+defineEmits([
   'tabuleiro-clique', 'pino-clique', 'pino-hover', 'arrastar-sair', 'pino-soltar',
   'pino-mouseentrar', 'pino-mousesair', 'disco-clique', 'disco-arrastar', 'disco-arrastar-fim'
 ]);
