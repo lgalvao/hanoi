@@ -5,6 +5,8 @@ export interface Disco {
   largura: number;
 }
 
+export type Pino = Disco[];
+
 export interface DiscoAnimado {
   id: number;
   tamanho: number;

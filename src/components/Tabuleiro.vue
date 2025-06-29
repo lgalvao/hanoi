@@ -18,7 +18,7 @@
         @click="$emit('pino-clique', indicePino)"
         @dragover="$emit('pino-hover', indicePino)"
         @dragleave="$emit('arrastar-sair', indicePino)"
-        @drop="$emit('pino-soltar', indicePino)"
+        @soltar="handleSoltar(indicePino)"
         @mouseenter="$emit('pino-mouseentrar', indicePino)"
         @mouseleave="$emit('pino-mousesair', indicePino)"
         @disco-clique="$emit('disco-clique', indicePino)"
@@ -31,9 +31,10 @@
 
 <script setup lang="ts">
 // Importações necessárias: o componente filho Pino e tipos TypeScript.
-import Pino from './Pino.vue';
-import {animacaoMovimento} from '../visualConfig.ts';
-import type { Disco, DiscoAnimado } from '../types.ts';
+import Pino from '@/components/Pino.vue';
+import {animacaoMovimento} from '@/visualConfig.ts';
+import type { Disco, DiscoAnimado } from '@/types.ts';
+import { podeMover } from '@/logica.ts';
 
 // --- PROPS DO COMPONENTE ---
 // defineProps é uma macro do Vue que define as propriedades que o componente pode receber de seu pai.
@@ -60,9 +61,10 @@ const props = defineProps<{
 // --- EVENTOS EMITIDOS ---
 // defineEmits declara os eventos que este componente pode emitir para o seu pai (App.vue).
 // Isso é bom para a documentação e organização do código.
-defineEmits([
+const emit = defineEmits([
   'tabuleiro-clique', 'pino-clique', 'pino-hover', 'arrastar-sair', 'pino-soltar',
-  'pino-mouseentrar', 'pino-mousesair', 'disco-clique', 'disco-arrastar', 'disco-arrastar-fim'
+  'pino-mouseentrar', 'pino-mousesair', 'disco-clique', 'disco-arrastar', 'disco-arrastar-fim',
+  'mover-disco'
 ]);
 
 // --- LÓGICA DE DELEGAÇÃO ---
@@ -79,8 +81,7 @@ function podeSoltar(indicePino: number): boolean {
   // A condição é que um pino de origem esteja selecionado, o destino não seja a própria origem,
   // e o movimento seja válido de acordo com as regras.
   return props.pinoSelecionado !== null &&
-      props.pinoSelecionado !== indicePino &&
-      podeMover(props.pinoSelecionado, indicePino);
+      podeMover(props.pinos, props.pinoSelecionado, indicePino);
 }
 
 /**
@@ -93,34 +94,22 @@ function estaArrastando(indicePino: number): boolean {
   return props.discoArrastando !== null && props.discoArrastando === indicePino;
 }
 
-// --- LÓGICA DE VALIDAÇÃO (DUPLICADA) ---
-// As funções `podeMover` e `topoDisco` são duplicadas do App.vue. Em um projeto maior,
-// elas poderiam ser extraídas para um arquivo utilitário (um "composable" do Vue)
-// para evitar repetição de código. Aqui, a duplicação é mantida para simplicidade,
-// já que o Tabuleiro precisa dessa lógica para o feedback visual imediato (`podeSoltar`).
-
 /**
- * Verifica se pode mover um disco de um pino para outro.
- * @param {number} de - Índice do pino de origem.
- * @param {number} para - Índice do pino de destino.
- * @returns {boolean}
+ * Lida com o evento de soltar um disco em um pino.
+ * @param {number} indicePinoDestino - O índice do pino onde o disco foi solto.
  */
-function podeMover(de: number, para: number): boolean {
-  const discoDe = topoDisco(de);
-  const discoPara = topoDisco(para);
-  if (!discoDe) return false;
-  if (!discoPara) return true;
-  return discoDe.tamanho < discoPara.tamanho;
-}
+function handleSoltar(indicePinoDestino: number) {
+  // Apenas processa se um pino de origem estiver selecionado
+  if (props.pinoSelecionado !== null) {
+    // Verifica se o movimento é permitido pelas regras do jogo
+    if (podeMover(props.pinos, props.pinoSelecionado, indicePinoDestino)) {
+      // Emite o evento para o componente pai (App.vue) realizar a mudança de estado
+      emit('mover-disco', props.pinoSelecionado, indicePinoDestino);
+    }
+  }
 
-/**
- * Retorna o disco do topo de um pino.
- * @param {number} indicePino - O índice do pino.
- * @returns {Disco | null}
- */
-function topoDisco(indicePino: number): Disco | null {
-  const pino = props.pinos[indicePino];
-  return pino.length > 0 ? pino[pino.length - 1] : null;
+  // Sempre emite o evento 'pino-soltar' para que o App.vue possa limpar estados de hover, etc.
+  emit('pino-soltar', indicePinoDestino);
 }
 
 // Define uma variável CSS para a largura do tabuleiro, baseada na configuração visual.

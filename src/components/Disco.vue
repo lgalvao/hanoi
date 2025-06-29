@@ -24,7 +24,7 @@
 
 <script setup lang="ts">
 import {computed} from 'vue';
-import {discoVisual, animacaoMovimento} from '../visualConfig.ts';
+import {discoVisual, animacaoMovimento} from '@/visualConfig.ts';
 
 // --- PROPS DO COMPONENTE ---
 // Define as propriedades que o componente Disco pode receber. A maioria delas controla o estado visual do disco.
@@ -88,7 +88,7 @@ const estiloAnimado = computed(() => {
     fontWeight: discoVisual.fontePeso, // Peso da fonte do texto.
     color: discoVisual.corTexto, // Cor do texto.
     textShadow: discoVisual.sombraTexto, // Sombra do texto.
-    position: 'absolute', // Posição absoluta para permitir a animação.
+    position: 'absolute' as const, // Posição absoluta para permitir a animação.
     pointerEvents: 'none' as const, // Desabilita os eventos de ponteiro para o disco animado.
   };
 });
@@ -126,7 +126,7 @@ const estiloEmpilhado = computed(() => {
     fontWeight: discoVisual.fontePeso, // Peso da fonte do texto.
     color: discoVisual.corTexto, // Cor do texto.
     textShadow: discoVisual.sombraTexto, // Sombra do texto.
-    position: 'absolute', // Posição absoluta para permitir a animação.
+    position: 'absolute' as const, // Posição absoluta para permitir a animação.
     left: '50%' // Posição horizontal (geralmente '50%' para centralizar).
   };
 });
@@ -142,7 +142,11 @@ const estiloDisco = computed(() => {
 
 // --- EVENTOS EMITIDOS ---
 // Declara os eventos que o componente pode emitir. Eles são capturados pelo Pino.vue e delegados para cima.
-const emit = defineEmits(['clique', 'arrastar', 'arrastar-fim']);
+const emit = defineEmits<{
+  clique: [],
+  arrastar: [],
+  'arrastar-fim': []
+}>();
 
 // --- LÓGICA DE EVENTOS ---
 

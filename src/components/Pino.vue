@@ -18,7 +18,7 @@
 
     <!-- Discos empilhados neste pino -->
     <div class="container-discos" role="list">
-      <Disco
+      <DiscoComponent
           v-for="(disco, i) in pino"
           :key="`${indicePino}-${disco.id}`"
           :tamanho="disco.tamanho"
@@ -41,20 +41,20 @@
     </div>
 
     <!-- Disco animado (quando este pino é origem) -->
-    <Disco v-if="discoAnimadoDestePino" v-bind="discoAnimadoDestePino" />
+    <DiscoComponent v-if="discoAnimadoDestePino" v-bind="discoAnimadoDestePino" />
   </div>
 </template>
 
 <script setup lang="ts">
-import Disco from './Disco.vue';
-import {tabuleiroVisual, animacaoMovimento} from '../visualConfig.ts';
+import DiscoComponent from '@/components/Disco.vue';
+import {tabuleiroVisual, animacaoMovimento} from '@/visualConfig.ts';
 import {computed} from 'vue';
-import type { Disco as DiscoType, DiscoAnimado } from '../types.ts';
+import type { DiscoAnimado, Pino, Disco } from '@/types.ts';
 
 // --- PROPS DO COMPONENTE ---
 // Estas são as propriedades que o Pino recebe do Tabuleiro.
 const props = defineProps<{
-  pino: DiscoType[], // O array de discos que estão neste pino.
+  pino: Pino, // O array de discos deste pino.
   indicePino: number, // O índice deste pino (0, 1 ou 2).
   podeSoltar: boolean, // Indica se este pino é um destino válido para soltar um disco.
   selecionado: boolean, // Indica se este pino é o pino de origem selecionado.
@@ -71,35 +71,37 @@ const props = defineProps<{
 
 /** Calcula a posição 'bottom' (CSS) para cada disco empilhado no pino. */
 const posicoesBase = computed(() =>
-    props.pino.map((_, i) => tabuleiroVisual.baseDiscos + i * tabuleiroVisual.espacoEntreDiscos)
+    props.pino.map((_: Disco, i: number) =>
+        tabuleiroVisual.baseDiscos + i * tabuleiroVisual.alturaDisco
+    )
 );
 
 /** Retorna o índice do disco que está no topo do pino. */
-const indiceTopo = computed(() => props.pino.length > 0 ? props.pino.length - 1 : -1);
+const indiceTopo = computed(() => (props.pino.length > 0 ? props.pino.length - 1 : -1));
 
 /** Gera um array de booleanos indicando qual disco (se algum) deve ter o estilo 'selecionado'. */
 const selecionados = computed(() =>
-    props.pino.map((_, i) => props.selecionado && i === indiceTopo.value)
+    props.pino.map((_: Disco, i: number) => props.selecionado && i === indiceTopo.value)
 );
 
 /** Gera um array de booleanos indicando qual disco (se algum) deve ter o estilo 'hover'. */
 const comHover = computed(() =>
-    props.pino.map((_, i) => props.hover && i === indiceTopo.value)
+    props.pino.map((_: Disco, i: number) => props.hover && i === indiceTopo.value)
 );
 
 /** Gera um array de booleanos indicando qual disco (se algum) está sendo arrastado. */
 const sendoArrastado = computed(() =>
-    props.pino.map((_, i) => props.arrastando && i === indiceTopo.value)
+    props.pino.map((_: Disco, i: number) => props.arrastando && i === indiceTopo.value)
 );
 
 /** Gera um array de booleanos para ocultar o disco original enquanto sua versão "fantasma" está animando. */
 const ocultos = computed(() =>
-    props.pino.map((disco) => props.discoMovendo && props.discoMovendo.id === disco.id)
+    props.pino.map((disco: Disco) => props.discoMovendo && props.discoMovendo.id === disco.id)
 );
 
 /** Gera um array de booleanos indicando qual disco (apenas o do topo) pode ser arrastado. */
 const arrastaveis = computed(() =>
-    props.pino.map((_, i) => i === indiceTopo.value && props.arrastavel)
+    props.pino.map((_: Disco, i: number) => i === indiceTopo.value && props.arrastavel)
 );
 
 /**

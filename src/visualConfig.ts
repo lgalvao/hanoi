@@ -1,12 +1,19 @@
-// Configurações visuais do tabuleiro
+/**
+ * Configurações visuais do tabuleiro do jogo.
+ * Define dimensões, espaçamentos e posicionamento dos elementos.
+ */
 export const tabuleiroVisual = {
   larguraBaseDisco: 60,
   fatorLarguraDisco: 20,
   baseDiscos: 70,
-  espacoEntreDiscos: 25
+  espacoEntreDiscos: 25,
+  alturaDisco: 25
 } as const;
 
-// Configurações de animação
+/**
+ * Configurações de animação para movimentos de discos.
+ * Controla timing, transições e efeitos visuais das animações.
+ */
 export const animacaoMovimento = {
   larguraTabuleiro: 900,
   larguraPino: 200,
@@ -19,7 +26,10 @@ export const animacaoMovimento = {
   sombraAnimacao: '0 8px 32px rgba(0, 0, 0, 0.3)'
 } as const;
 
-// Configurações visuais do disco
+/**
+ * Configurações visuais dos discos individuais.
+ * Define aparência, dimensões e estilos dos discos.
+ */
 export const discoVisual = {
   altura: 25,
   raioBorda: 12.5,
@@ -29,4 +39,33 @@ export const discoVisual = {
   fontePeso: 'bold',
   corTexto: '#ffffff',
   sombraTexto: '1px 1px 2px rgba(0, 0, 0, 0.5)'
-} as const; 
+} as const;
+
+/**
+ * Paleta de cores para os discos do jogo.
+ * Cores vibrantes e distintas para facilitar identificação visual.
+ */
+export const CORES_DISCOS = [
+  '#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5',
+  '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50',
+  '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800',
+  '#ff5722'
+];
+
+/**
+ * Gera uma lista de cores para os discos baseada na quantidade especificada.
+ * Retorna uma fatia da paleta de cores, garantindo que não exceda o limite disponível.
+ * 
+ * @param {number} quantidade - O número de discos que precisam de cores.
+ * @returns {string[]} Array de strings de cores hexadecimais.
+ * 
+ * @example
+ * ```typescript
+ * const cores = gerarCores(3);
+ * // Retorna: ['#f44336', '#e91e63', '#9c27b0']
+ * ```
+ */
+export function gerarCores(quantidade: number): string[] {
+  // Retorna uma fatia da paleta de cores, garantindo que não estoure o limite.
+  return CORES_DISCOS.slice(0, quantidade);
+}
