@@ -5,9 +5,9 @@
 Use esta seção para informar às pessoas sobre quais versões do seu projeto estão atualmente sendo suportadas com atualizações de segurança.
 
 | Versão | Suportada          |
-| ------- | ------------------ |
-| 1.0.x   | :white_check_mark: |
-| < 1.0   | :x:                |
+|--------|--------------------|
+| 1.0.x  | :white_check_mark: |
+| < 1.0  | :x:                |
 
 ## Reportando uma Vulnerabilidade
 
