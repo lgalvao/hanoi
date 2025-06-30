@@ -2,7 +2,9 @@
 
 Uma implementação moderna e interativa do clássico quebra-cabeça Torre de Hanói, construída com Vue 3, TypeScript e Vite.
 
-## 🎮 [Jogar Agora](https://seu-dominio.com/hanoi)
+## 🤖 Transparência e autoria
+
+Todo o código deste sistema foi criado com o auxílio de LLMs (Modelos de Linguagem de Grande Escala), utilizando as ferramentas Cursor, Claude, Windsurf e GitHub Copilot. Não houve desenvolvimento manual sem o uso dessas ferramentas.
 
 ### ✨ Características
 - 🎯 Validação automática de movimentos

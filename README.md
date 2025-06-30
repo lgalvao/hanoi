@@ -154,6 +154,10 @@ Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalh
 - [Vitest](https://vitest.dev/) - Framework de testes
 - [TypeScript](https://www.typescriptlang.org/) - JavaScript tipado
 
+## 🤖 Transparência e autoria
+
+Todo o código deste sistema foi criado com o auxílio de LLMs (Modelos de Linguagem de Grande Escala), utilizando as ferramentas Cursor, Claude, Windsurf e GitHub Copilot. Não houve desenvolvimento manual sem o uso dessas ferramentas.
+
 ---
 
 **Desenvolvido com ❤️ usando Vue 3 + TypeScript** 
