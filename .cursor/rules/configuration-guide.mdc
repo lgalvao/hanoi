@@ -1,0 +1,79 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Configuration Guide
+
+## Build Configuration
+
+The project uses **Vite** as the build tool, configured in [vite.config.ts](mdc:vite.config.ts).
+
+### Key Configuration
+
+- **Path Alias**: `@` maps to `src/` directory for clean imports
+- **Vue Plugin**: Configured for Vue 3 with TypeScript support
+- **Test Environment**: JSDOM for component testing
+
+## TypeScript Configuration
+
+TypeScript is configured in [tsconfig.json](mdc:tsconfig.json) and [tsconfig.node.json](mdc:tsconfig.node.json).
+
+### Key Settings
+
+- **Target**: ES2022 for modern JavaScript features
+- **Module Resolution**: Node.js style
+- **Strict Mode**: Enabled for type safety
+- **Path Mapping**: Aligned with Vite configuration
+
+## Visual Configuration
+
+Game styling and animations are centralized in [src/visualConfig.ts](mdc:src/visualConfig.ts).
+
+### Configuration Structure
+
+```typescript
+export const CORES_DISCOS = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57']
+export const ALTURA_DISCO = 30
+export const LARGURA_BASE = 200
+export const ALTURA_PINO = 200
+export const DURACAO_ANIMACAO = 300
+```
+
+### Usage Patterns
+
+- Import configuration constants in components
+- Use CSS custom properties for dynamic styling
+- Maintain consistent spacing and sizing
+- Follow the established color scheme
+
+## Package Configuration
+
+The [package.json](mdc:package.json) defines:
+
+- **Scripts**: Development, build, test, and type-check commands
+- **Dependencies**: Vue 3, TypeScript, Vite, and testing libraries
+- **Dev Dependencies**: ESLint, Prettier, and development tools
+
+## Development Scripts
+
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run preview      # Preview production build
+npm test             # Run tests
+npm run type-check   # Check TypeScript types
+```
+
+## Linting and Formatting
+
+- **ESLint**: Configured for Vue 3 and TypeScript
+- **Prettier**: Code formatting (if configured)
+- **TypeScript**: Strict type checking
+
+## Environment Setup
+
+The project requires:
+- **Node.js**: Version 18+ recommended
+- **npm**: For package management
+- **Modern Browser**: For development and testing

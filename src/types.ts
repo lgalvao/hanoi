@@ -17,4 +17,10 @@ export interface DiscoAnimado {
   animandoFinal: boolean;
   pinoOrigem: number;
   pinoDestino: number;
+}
+
+export interface EstadoJogo {
+  pinos: Pino[];
+  movimentos: number;
+  vitoria: boolean;
 } 

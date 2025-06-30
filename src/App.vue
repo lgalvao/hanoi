@@ -39,50 +39,47 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref, nextTick} from 'vue';
+import {onMounted, ref, nextTick, computed} from 'vue';
 import Controles from '@/components/Controles.vue';
 import Tabuleiro from '@/components/Tabuleiro.vue';
 import {animacaoMovimento, tabuleiroVisual} from '@/visualConfig.ts';
-import {gerarPinosIniciais, podeMover, topoDisco} from '@/logica.ts';
-import type { DiscoAnimado, Pino } from '@/types.ts';
+import {inicializarJogo, aplicarMovimento, podeMover, topoDisco} from '@/logica.ts';
+import type { DiscoAnimado, EstadoJogo } from '@/types.ts';
 
 // --- ESTADO REATIVO DO JOGO ---
 const quantidadeDiscos = ref(4);
-const pinos = ref<Pino[]>([[], [], []]);
-const movimentos = ref(0);
+const estado = ref<EstadoJogo>(inicializarJogo(quantidadeDiscos.value));
 const pinoSelecionado = ref<number | null>(null);
 const discoArrastando = ref<number | null>(null);
 const pinoHover = ref<number | null>(null);
 const autoResolvendo = ref(false);
-const jogoGanho = ref(false);
 const discoMovendo = ref<DiscoAnimado | null>(null);
 const vitoriaManual = ref(false);
+
+// --- GETTERS DERIVADOS ---
+const pinos = computed(() => estado.value.pinos);
+const movimentos = computed(() => estado.value.movimentos);
+const jogoGanho = computed(() => estado.value.vitoria);
 
 // --- FUNÇÕES DE LÓGICA DO JOGO ---
 function reiniciarJogo(novaQuantidade?: number) {
   if (novaQuantidade) {
     quantidadeDiscos.value = novaQuantidade;
   }
-  pinos.value = gerarPinosIniciais(quantidadeDiscos.value);
-  movimentos.value = 0;
+  estado.value = inicializarJogo(quantidadeDiscos.value);
   pinoSelecionado.value = null;
   autoResolvendo.value = false;
-  jogoGanho.value = false;
 }
 
 function moverDisco(de: number, para: number) {
-  if (!podeMover(pinos.value, de, para)) return;
-
-  const disco = pinos.value[de].pop();
-  if (disco) {
-    pinos.value[para].push(disco);
-    movimentos.value++;
-    verificarVitoria();
+  const novoEstado = aplicarMovimento(estado.value, de, para);
+  if (novoEstado) {
+    estado.value = novoEstado;
   }
 }
 
 function verificarVitoria() {
-  jogoGanho.value = pinos.value[0].length === 0 && pinos.value[1].length === 0;
+  // Não é mais necessário, pois vitoria é parte do estado
 }
 
 // --- MANIPULADORES DE EVENTOS (CLIQUE) ---

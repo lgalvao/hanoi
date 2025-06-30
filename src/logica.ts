@@ -1,4 +1,4 @@
-import type { Disco, Pino } from '@/types';
+import type { Disco, Pino, EstadoJogo } from '@/types';
 import { gerarCores } from '@/visualConfig';
 
 /**
@@ -135,4 +135,79 @@ export function gerarMovimentosHanoi(n: number, de: number, para: number, aux: n
   }
   resolver(n, de, para, aux);
   return movimentos;
+}
+
+/**
+ * Move um disco de um pino para outro, retornando um novo array de pinos (imutável).
+ * Retorna null se o movimento não for válido.
+ *
+ * @param {Pino[]} pinos - Estado atual dos pinos.
+ * @param {number} de - Índice do pino de origem.
+ * @param {number} para - Índice do pino de destino.
+ * @returns {Pino[] | null} Novo array de pinos após o movimento, ou null se inválido.
+ *
+ * @example
+ * ```typescript
+ * const novoEstado = moverDisco(pinos, 0, 2);
+ * ```
+ */
+export function moverDisco(pinos: Pino[], de: number, para: number): Pino[] | null {
+  if (!podeMover(pinos, de, para)) return null;
+  if (de === para) return null;
+  if (pinos[de].length === 0) return null;
+
+  // Copia profunda dos pinos
+  const novosPinos: Pino[] = pinos.map(p => [...p]);
+  const disco = novosPinos[de].pop();
+  if (!disco) return null;
+  novosPinos[para].push(disco);
+  return novosPinos;
+}
+
+/**
+ * Verifica se o jogo foi vencido (todos os discos no último pino).
+ *
+ * @param {Pino[]} pinos - Estado atual dos pinos.
+ * @returns {boolean} True se o jogo foi vencido.
+ *
+ * @example
+ * ```typescript
+ * const ganhou = verificarVitoria(pinos);
+ * ```
+ */
+export function verificarVitoria(pinos: Pino[]): boolean {
+  // Considera vitória se todos os discos estão no último pino e os outros estão vazios
+  return pinos.slice(0, -1).every(p => p.length === 0) && pinos[pinos.length - 1].length > 0;
+}
+
+/**
+ * Inicializa o estado completo do jogo.
+ * @param quantidade Número de discos
+ * @returns EstadoJogo inicial
+ */
+export function inicializarJogo(quantidade: number): EstadoJogo {
+  return {
+    pinos: gerarPinosIniciais(quantidade),
+    movimentos: 0,
+    vitoria: false,
+  };
+}
+
+/**
+ * Aplica um movimento ao estado do jogo, retornando um novo estado (imutável).
+ * Retorna null se o movimento não for válido.
+ * @param estado Estado atual do jogo
+ * @param de Índice do pino de origem
+ * @param para Índice do pino de destino
+ * @returns Novo EstadoJogo ou null se inválido
+ */
+export function aplicarMovimento(estado: EstadoJogo, de: number, para: number): EstadoJogo | null {
+  const novosPinos = moverDisco(estado.pinos, de, para);
+  if (!novosPinos) return null;
+  const vitoria = verificarVitoria(novosPinos);
+  return {
+    pinos: novosPinos,
+    movimentos: estado.movimentos + 1,
+    vitoria,
+  };
 }
