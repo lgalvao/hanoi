@@ -115,9 +115,6 @@ const discoAnimadoDestePino = computed(() => {
   // Só cria o disco animado se houver um disco se movendo e se este pino for a origem.
   if (!d || d.pinoOrigem !== props.indicePino) return null;
   
-  // Calcula o deslocamento horizontal necessário para a animação.
-  const deslocamentoHorizontal = (d.pinoDestino - d.pinoOrigem) * (animacaoMovimento.larguraPino + animacaoMovimento.margemPino);
-  
   // Retorna um objeto que será passado como props para um novo componente Disco.
   // Este objeto controla a posição, transformação e estilo do disco durante a animação.
   return {
@@ -125,7 +122,7 @@ const discoAnimadoDestePino = computed(() => {
     largura: d.largura,
     cor: d.cor,
     posx: '50%',
-    posy: d.animandoFinal ? d.bottomFinal : d.bottom, // Anima a posição vertical.
+    posy: d.posY, // Anima a posição vertical.
     topo: false,
     selecionado: false,
     hover: false,
@@ -134,7 +131,7 @@ const discoAnimadoDestePino = computed(() => {
     arrastavel: false,
     animado: true, // Flag crucial que diz ao Disco.vue para usar seu estilo de animação.
     transition: animacaoMovimento.transicaoAnimacao,
-    transform: d.animandoFinal ? `translateX(calc(-50% + ${deslocamentoHorizontal}px))` : 'translateX(-50%)', // Anima a posição horizontal.
+    transform: `translate(calc(-50% + ${d.posX}px), 0)`, // Anima a posição horizontal.
     boxShadow: animacaoMovimento.sombraAnimacao
   };
 });

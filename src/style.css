@@ -42,7 +42,8 @@ body {
     --pino-box-shadow-pode-soltar-sobre: 0 0 0 8px rgba(38, 180, 122, 0.3);
 
     /* Tabuleiro */
-    --tabuleiro-largura: 900px;
+    --tabuleiro-largura: 100%;
+    --tabuleiro-max-largura: 900px;
     --tabuleiro-altura: 480px;
     --tabuleiro-cor-fundo: #f3f6fa;
     --tabuleiro-raio-borda: 18px;

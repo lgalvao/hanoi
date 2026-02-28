@@ -78,10 +78,6 @@ function moverDisco(de: number, para: number) {
   }
 }
 
-function verificarVitoria() {
-  // Não é mais necessário, pois vitoria é parte do estado
-}
-
 // --- MANIPULADORES DE EVENTOS (CLIQUE) ---
 function aoClicarPinoOuDisco(indicePino: number) {
   if (autoResolvendo.value || jogoGanho.value) return;
@@ -149,21 +145,43 @@ function moverAnimadoSimples(de: number, para: number) {
     const bottomInicial = baseDiscos + (pinos.value[de].length - 1) * espacoDiscos;
     const bottomFinal = baseDiscos + pinos.value[para].length * espacoDiscos;
 
+    // Calculando a distância X baseada no DOM real (caixa-pino)
+    const pinosDOM = document.querySelectorAll('.caixa-pino');
+    let posXAtual = 0;
+
+    if (pinosDOM.length >= 3) {
+      const pinoDe = pinosDOM[de].getBoundingClientRect();
+      const pinoPara = pinosDOM[para].getBoundingClientRect();
+
+      const pinoDeCenterX = pinoDe.left + pinoDe.width / 2;
+      const pinoParaCenterX = pinoPara.left + pinoPara.width / 2;
+
+      // O offset de deslocamento X
+      posXAtual = pinoParaCenterX - pinoDeCenterX;
+    }
+
     discoMovendo.value = {
       ...disco,
       pinoOrigem: de,
       pinoDestino: para,
-      bottom: bottomInicial,
+      posY: bottomInicial,
+      posX: 0,
       bottomFinal: bottomFinal,
       animandoFinal: false,
     };
 
     await nextTick();
 
-    discoMovendo.value.bottom = 200; // alturaAnimacao fixa
+    // 1. Move para cima
+    discoMovendo.value.posY = 350; // alturaAnimacao fixa, superior ao topo do pino
     await new Promise(r => setTimeout(r, animacaoMovimento.tempoAnimacao));
 
-    discoMovendo.value.animandoFinal = true;
+    // 2. Move para os lados
+    discoMovendo.value.posX = posXAtual;
+    await new Promise(r => setTimeout(r, animacaoMovimento.tempoAnimacao));
+
+    // 3. Move para baixo (até o bottomFinal)
+    discoMovendo.value.posY = bottomFinal;
     await new Promise(r => setTimeout(r, animacaoMovimento.tempoAnimacao));
 
     moverDisco(de, para);
@@ -202,6 +220,7 @@ onMounted(reiniciarJogo);
 <style scoped>
 .container-jogo {
   font-family: 'Inter', 'Nunito', 'Segoe UI', Arial, sans-serif;
+  width: 100%;
   max-width: 900px;
   margin: 48px auto;
   padding: 36px 32px 32px 32px;
@@ -209,6 +228,7 @@ onMounted(reiniciarJogo);
   background: #fafdff;
   box-shadow: 0 6px 32px rgba(0, 0, 0, 0.1);
   text-align: center;
+  box-sizing: border-box;
 }
 
 h1 {
