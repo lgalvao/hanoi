@@ -32,7 +32,6 @@
 <script setup lang="ts">
 // Importações necessárias: o componente filho Pino e tipos TypeScript.
 import Pino from '@/components/Pino.vue';
-import {animacaoMovimento} from '@/visualConfig.ts';
 import type { Disco, DiscoAnimado } from '@/types.ts';
 import { podeMover } from '@/logica.ts';
 
@@ -113,7 +112,7 @@ function handleSoltar(indicePinoDestino: number) {
 }
 
 // Define uma variável CSS para a largura do tabuleiro, baseada na configuração visual.
-const tabuleiroLargura = animacaoMovimento.larguraTabuleiro + 'px';
+const tabuleiroLargura = '100%';
 </script>
 
 <style scoped>
@@ -129,6 +128,7 @@ const tabuleiroLargura = animacaoMovimento.larguraTabuleiro + 'px';
   position: relative;
   overflow: visible;
   width: var(--tabuleiro-largura);
+  max-width: var(--tabuleiro-max-largura);
   margin: 40px auto 0;
 }
 

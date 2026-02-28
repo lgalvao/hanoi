@@ -12,11 +12,12 @@ export interface DiscoAnimado {
   tamanho: number;
   cor: string;
   largura: number;
-  bottom: number;
-  bottomFinal: number;
-  animandoFinal: boolean;
+  posY: number;
+  posX: number;
   pinoOrigem: number;
   pinoDestino: number;
+  animandoFinal: boolean;
+  bottomFinal: number;
 }
 
 export interface EstadoJogo {

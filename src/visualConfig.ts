@@ -18,10 +18,10 @@ export const animacaoMovimento = {
   larguraTabuleiro: 900,
   larguraPino: 200,
   margemPino: 10,
-  tempoAnimacao: 300,
+  tempoAnimacao: 200,
   tempoRenderizacao: 10,
   tempoLimpeza: 50,
-  transicaoAnimacao: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  transicaoAnimacao: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
   zIndexAnimacao: 1000,
   sombraAnimacao: '0 8px 32px rgba(0, 0, 0, 0.3)'
 } as const;

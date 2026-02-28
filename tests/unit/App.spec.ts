@@ -1,14 +1,22 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import App from '@/App.vue';
-import { gerarPinosIniciais } from '@/logica';
+import { inicializarJogo } from '@/logica';
 
 // Mock das funções de lógica
-vi.mock('@/logica', () => ({
-  gerarPinosIniciais: vi.fn(() => [[{ id: 1, tamanho: 1, cor: '#fff', largura: 60 }], [], []]),
-  podeMover: vi.fn(() => true),
-  topoDisco: vi.fn(() => ({ id: 1, tamanho: 1, cor: '#fff', largura: 60 }))
-}));
+vi.mock('@/logica', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/logica')>();
+  return {
+    ...actual,
+    inicializarJogo: vi.fn(() => ({
+      pinos: [[{ id: 1, tamanho: 1, cor: '#fff', largura: 60 }], [], []],
+      movimentos: 0,
+      vitoria: false,
+    })),
+    podeMover: vi.fn(() => true),
+    topoDisco: vi.fn(() => ({ id: 1, tamanho: 1, cor: '#fff', largura: 60 }))
+  };
+});
 
 describe('App.vue', () => {
   beforeEach(() => {
@@ -52,7 +60,7 @@ describe('App.vue', () => {
     
     await controles.vm.$emit('reiniciar');
     
-    expect(gerarPinosIniciais).toHaveBeenCalledWith(4);
+    expect(inicializarJogo).toHaveBeenCalledWith(4);
   });
 
   it('altera quantidade de discos quando evento é emitido', async () => {
@@ -61,7 +69,7 @@ describe('App.vue', () => {
     
     await controles.vm.$emit('alterar-quantidade-discos', 6);
     
-    expect(gerarPinosIniciais).toHaveBeenCalledWith(6);
+    expect(inicializarJogo).toHaveBeenCalledWith(6);
   });
 
   it('inicia auto-resolução quando evento é emitido', async () => {
